@@ -72,6 +72,7 @@ export default function Lookup() {
         const filteredCars = currentCars.filter((car) => car.id !== id);
         setCars([...filteredCars]);
         notify("Successfully Deleted", true);
+        setRefresh(!refresh);
       });
   }
 

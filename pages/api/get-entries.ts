@@ -46,21 +46,19 @@ export default async function handler(
   // see how many entries are in the database Cars table
   const { count } = await supabase
     .from("Cars")
-    .select("id", { count: "exact", head: true });
+    .select("id", { count: "exact", head: true })
+    .or(`VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%`);
 
   const numberOfPages = Math.ceil((count as any) / PAGE_SIZE);
   const start = (pageNumber - 1) * PAGE_SIZE;
   const end = start + PAGE_SIZE - 1;
-  let query = supabase
-    .from("Cars")
-    .select("*")
-    .range(start, end);
+  let query = supabase.from("Cars").select("*").range(start, end);
   console.log(text);
   if (text !== "") {
     query = query.or(`VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%`);
   }
   // get the entries from the database
-  const { data, error } = await query
+  const { data, error } = await query;
 
   if (error) {
     return res.status(500).json({
