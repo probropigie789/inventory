@@ -8,6 +8,15 @@ First, install dependencies in the root of the folder!
 npm install
 # or
 yarn
+# to install the dependencies specified in the package.json file
+```
+
+Create a .env.local file at the root of the project with the following variables
+- you can get these values from the supabase dahsboard
+  
+```bash
+NEXT_PUBLIC_SUPABASE_URL=""
+NEXT_PUBLIC_SUPABASE_ANON_KEY=""
 ```
 
 Then run the development server:
