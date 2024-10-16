@@ -1,6 +1,6 @@
 
 
-## Getting Started
+## Cars Inventory
 
 First, run the development server:
 
