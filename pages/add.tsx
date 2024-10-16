@@ -6,12 +6,12 @@ import {
   FilesIcon,
   LogOut,
   LogOutIcon,
+  Search,
   UserCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 export default function Add() {
   const [loading, setLoading] = useState(false);
   const [vin, setVin] = useState("");
@@ -28,7 +28,7 @@ export default function Add() {
   function notify(message: string, success: boolean) {
     if (success) {
       toast.success(message, {
-        position: "top-right",
+        position: "bottom-center",
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -38,7 +38,7 @@ export default function Add() {
       });
     } else {
       toast.error(message, {
-        position: "top-right",
+        position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -98,7 +98,7 @@ export default function Add() {
           }}
           className="p-2 rounded-full border-2 border-white"
         >
-          <FilesIcon size={18} strokeWidth={1} color="white" />
+          <Search size={18} strokeWidth={1} color="white" />
         </button>
         <div className="flex items-center gap-4">
           <div>
@@ -116,7 +116,7 @@ export default function Add() {
         </div>
       </div>
 
-      <div className="w-full bg-gray-800 p-8 border shadow-lg rounded-md mt-auto mb-auto max-w-[90vw] md:max-w-md">
+      <div className="w-full bg-slate-800 p-8 border shadow-lg rounded-md mt-auto mb-auto max-w-[90vw] md:max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-center text-white">
           Add Car Entry
         </h1>
