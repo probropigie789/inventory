@@ -91,12 +91,12 @@ export default function Add() {
 
   return (
     <div className="relative h-screen flex flex-col items-center text-white bg-slate-900">
-      <div className="p-6 w-full flex justify-between place-items-center">
+      <div className="p-6 w-full flex flex-col md:flex-row justify-between  gap-4">
         <button
           onClick={() => {
             window.location.href = "/lookup";
           }}
-          className="p-2 rounded-full border-2 border-white"
+          className="p-2 rounded-full border-2 border-white w-max mr-auto"
         >
           <Search size={18} strokeWidth={1} color="white" />
         </button>
@@ -104,7 +104,7 @@ export default function Add() {
           <div>
             <UserCircle size={42} strokeWidth={1} />
           </div>
-          <div>
+          <div className="m-auto">
             <p className="text-white">{session?.user?.email}</p>
           </div>
           <button

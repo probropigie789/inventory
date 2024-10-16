@@ -104,10 +104,12 @@ export default function Lookup() {
   }, [page, refresh]);
 
   useEffect(() => {
-    flushSync(() => {
-      setPage(1);
+    // flushSync(() => {});
+
+    setPage(1);
+    setTimeout(() => {
       setRefresh(!refresh);
-    });
+    }, 0); // Defer to the next event loop cycle
   }, [text]);
 
   const handleNext = () => {
@@ -124,12 +126,12 @@ export default function Lookup() {
 
   return (
     <div className="relative h-dvh flex flex-col items-center text-white bg-slate-900 overflow-hidden">
-      <div className="p-6 w-full flex justify-between place-items-center">
+      <div className="p-6 w-full flex flex-col gap-4 md:flex-row md:justify-between">
         <button
           onClick={() => {
             window.location.href = "/add";
           }}
-          className="p-2 rounded-full shadow-md border-2 border-green-700"
+          className="p-2 rounded-full shadow-md border-2 border-green-700 w-max mr-auto"
         >
           <Plus size={18} strokeWidth={2} color="green" />
         </button>
@@ -137,7 +139,7 @@ export default function Lookup() {
           <div>
             <UserCircle size={42} strokeWidth={1} />
           </div>
-          <div>
+          <div className="m-auto">
             <p className="text-white">{session?.user?.email}</p>
           </div>
           <button
@@ -156,7 +158,7 @@ export default function Lookup() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Search for entry with VIN or License Plate"
-          className="  w-[30vw] pl-10 pr-3 py-2 border outline-none border-gray-500 bg-gray-700 rounded-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
+          className="w-[90vw]  md:w-[40vw] lg:w-[30vw] pl-10 pr-3 py-2 border outline-none border-gray-500 bg-gray-700 rounded-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
         />
       </div>
 
