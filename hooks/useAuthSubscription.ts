@@ -25,10 +25,10 @@ function getNextRoute(
       next = session ? (currentPath === "/" ? "/lookup" : currentPath) : "/";
       break;
     case "TOKEN_REFRESHED":
-      next = session ? (currentPath === "/" ? "/loopup" : currentPath) : "/";
+      next = session ? (currentPath === "/" ? "/lookup" : currentPath) : "/";
       break;
     case "SIGNED_IN":
-      next = currentPath === "/" ? "/loopup" : currentPath;
+      next = currentPath === "/" ? "/lookup" : currentPath;
       break;
     case "SIGNED_OUT":
       next = "/";

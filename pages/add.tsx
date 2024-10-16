@@ -1,6 +1,11 @@
-import { useState } from "react";
-
+import { supabase } from "@/Database/uiClient";
+import { AuthContext } from "@/Providers/AuthProvider";
+import { CircleDashed, LogOut, LogOutIcon, UserCircle } from "lucide-react";
+import { useContext, useState } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 export default function Add() {
+  const [loading, setLoading] = useState(false);
   const [vin, setVin] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
   const [year, setYear] = useState("");
@@ -8,7 +13,42 @@ export default function Add() {
   const [model, setModel] = useState("");
   const [color, setColor] = useState("");
 
+  // get authcontext session context api
+
+  let { session, isAuthStateLoading } = useContext(AuthContext);
+
+  function notify(message: string, success: boolean) {
+    if (success) {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } else {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+    setLoading(false);
+  }
+
   const handleAddCar = () => {
+    setLoading(true);
+    if (!vin || !licensePlate || !year || !maker || !model || !color) {
+      notify("Please fill all the fields", false);
+      return;
+    }
+
     fetch("/api/add-entry", {
       method: "POST",
       headers: {
@@ -22,27 +62,40 @@ export default function Add() {
         model: model,
         color: color,
       }),
-    });
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        let { data, error } = result;
+        if (error) {
+          notify(error, false);
+          return;
+        }
+        setVin("");
+        setLicensePlate("");
+        setYear("");
+        setMaker("");
+        setModel("");
+        setColor("");
+        notify("Car added successfully", true);
+      });
   };
 
   return (
     <div className="relative h-screen flex items-center justify-center text-white bg-slate-900">
       <div className="absolute top-0 right-0 p-6">
-        <div className="flex flex-col items-end gap-2">
-          <div className="flex items-center gap-4">
-            <div>
-              <img
-                src="/profile.png"
-                alt="User Icon"
-                className="w-12 h-12 rounded-full"
-              />
-            </div>
-            <div>
-              <p className="text-white">inventory@gmail.com</p>
-            </div>
+        <div className="flex items-center gap-4">
+          <div>
+            <UserCircle size={42} strokeWidth={1} />
           </div>
-          <button className="py-2 px-4 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-red-400">
-            Sign Out
+          <div>
+            <p className="text-white">{session?.user?.email}</p>
+          </div>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="p-2 rounded-full border-2 border-red-900"
+          >
+            <LogOut size={18} strokeWidth={3} color="red" />
           </button>
         </div>
       </div>
@@ -132,10 +185,20 @@ export default function Add() {
           </div>
           <button
             type="button"
+            disabled={loading}
             onClick={handleAddCar}
             className="w-full py-2 px-4 bg-blue-600  text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-blue-500"
           >
-            Add
+            {loading ? (
+              <CircleDashed
+                size={24}
+                strokeWidth={3}
+                color="white"
+                className="animate-spin m-auto"
+              />
+            ) : (
+              "Add Car"
+            )}
           </button>
         </form>
       </div>
