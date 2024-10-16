@@ -92,7 +92,7 @@ export default function Lookup() {
       .then((body) => {
         console.log(body.data);
         setCars(body.data.cars);
-        setTotalPages(body.data.maxPages);
+        setTotalPages(body.data.maxPages === 0 ? 1 : body.data.maxPages);
         setCount(body.data.totalCount);
       })
       .catch((error) => {
@@ -101,7 +101,7 @@ export default function Lookup() {
       .finally(() => {
         setLoading(false);
       });
-  }, [refresh]);
+  }, [page, refresh]);
 
   useEffect(() => {
     flushSync(() => {
