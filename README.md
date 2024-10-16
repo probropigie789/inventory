@@ -23,5 +23,5 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-The project is hosted at this link through vercel.
+The project is hosted at this link down below!
 [Hosted link](https://carsinventory.vercel.app/)  
