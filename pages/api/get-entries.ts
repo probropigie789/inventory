@@ -7,7 +7,7 @@ type Data = {
   data: any;
 };
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 2;
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,7 +29,7 @@ export default async function handler(
   }
 
   // get the body of the request
-  let { pageNumber } = req.body;
+  let { pageNumber, text } = req.body;
 
   // validate the body
   if (!pageNumber) {
@@ -51,12 +51,16 @@ export default async function handler(
   const numberOfPages = Math.ceil((count as any) / PAGE_SIZE);
   const start = (pageNumber - 1) * PAGE_SIZE;
   const end = start + PAGE_SIZE - 1;
-
-  // get the entries from the database
-  const { data, error } = await supabase
+  let query = supabase
     .from("Cars")
     .select("*")
     .range(start, end);
+  console.log(text);
+  if (text !== "") {
+    query = query.or(`VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%`);
+  }
+  // get the entries from the database
+  const { data, error } = await query
 
   if (error) {
     return res.status(500).json({
