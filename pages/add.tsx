@@ -1,6 +1,14 @@
 import { supabase } from "@/Database/uiClient";
 import { AuthContext } from "@/Providers/AuthProvider";
-import { CircleDashed, LogOut, LogOutIcon, UserCircle } from "lucide-react";
+import {
+  ArrowLeftSquare,
+  CircleDashed,
+  FilesIcon,
+  LogOut,
+  LogOutIcon,
+  UserCircle,
+} from "lucide-react";
+import Link from "next/link";
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -82,8 +90,16 @@ export default function Add() {
   };
 
   return (
-    <div className="relative h-screen flex items-center justify-center text-white bg-slate-900">
-      <div className="absolute top-0 right-0 p-6">
+    <div className="relative h-screen flex flex-col items-center text-white bg-slate-900">
+      <div className="p-6 w-full flex justify-between place-items-center">
+        <button
+          onClick={() => {
+            window.location.href = "/lookup";
+          }}
+          className="p-2 rounded-full border-2 border-white"
+        >
+          <FilesIcon size={18} strokeWidth={1} color="white" />
+        </button>
         <div className="flex items-center gap-4">
           <div>
             <UserCircle size={42} strokeWidth={1} />
@@ -93,14 +109,14 @@ export default function Add() {
           </div>
           <button
             onClick={() => supabase.auth.signOut()}
-            className="p-2 rounded-full border-2 border-red-900"
+            className="p-2 rounded-full border-2 border-red-700"
           >
-            <LogOut size={18} strokeWidth={3} color="red" />
+            <LogOut size={18} strokeWidth={1} color="red" />
           </button>
         </div>
       </div>
 
-      <div className="w-full max-w-md bg-gray-800 p-8 border shadow-lg rounded-md">
+      <div className="w-full bg-gray-800 p-8 border shadow-lg rounded-md mt-auto mb-auto max-w-[90vw] md:max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-center text-white">
           Add Car Entry
         </h1>

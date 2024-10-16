@@ -18,6 +18,10 @@ function getNextRoute(
   }
 
   // Determine the next route based on the auth event
+  console.log("event", event);
+  console.log("session", session);
+  console.log("currentPath", currentPath);
+
   switch (event) {
     case "INITIAL_SESSION":
       // If there's a session, and the current path is "/", redirect to the dashboard, otherwise stay on the current path
@@ -55,7 +59,7 @@ export default function useAuthSubscription({
       const nextRoutePath = getNextRoute(
         event,
         session,
-        router.pathname,
+        window.location.pathname,
         unprotected,
       );
       setNextRoute(nextRoutePath);
