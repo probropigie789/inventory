@@ -2,7 +2,7 @@
 
 ## Cars Inventory
 
-First, install dependencies in the root of the folder!
+First, install dependencies in the root of the folder.
 
 ```bash
 npm install
