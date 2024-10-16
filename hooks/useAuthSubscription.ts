@@ -22,13 +22,13 @@ function getNextRoute(
     case "INITIAL_SESSION":
       // If there's a session, and the current path is "/", redirect to the dashboard, otherwise stay on the current path
       // If there's no session, redirect to "/"
-      next = session ? (currentPath === "/" ? "/dashboard" : currentPath) : "/";
+      next = session ? (currentPath === "/" ? "/lookup" : currentPath) : "/";
       break;
     case "TOKEN_REFRESHED":
-      next = session ? (currentPath === "/" ? "/dashboard" : currentPath) : "/";
+      next = session ? (currentPath === "/" ? "/loopup" : currentPath) : "/";
       break;
     case "SIGNED_IN":
-      next = currentPath === "/" ? "/dashboard" : currentPath;
+      next = currentPath === "/" ? "/loopup" : currentPath;
       break;
     case "SIGNED_OUT":
       next = "/";

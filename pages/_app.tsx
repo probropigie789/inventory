@@ -6,7 +6,7 @@ import { ToastContainer } from "react-toastify";
 
 export default function App({ Component, pageProps }: AppProps) {
   const { session, isAuthStateLoading } = useAuthSubscription({
-    unprotectedRoutes: ["/"],
+    unprotectedRoutes: [],
   });
   return (
     <AuthContext.Provider
