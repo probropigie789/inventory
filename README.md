@@ -1,4 +1,5 @@
-## Cars Inventory
+## Cars Inventory 
+made with Next.js
 
 First, install dependencies in the root of the folder.
 
