@@ -27,12 +27,23 @@ export default async function handler(
   }
 
   // get the body of the request
-  let { vin, licensePlate, year, maker, model, color, email } = req.body;
+  let { vin, licensePlate, year, maker, model, color, email, location, image } =
+    req.body;
 
   // validate the body
-  if (!vin || !licensePlate || !year || !maker || !model || !color) {
+  if (
+    !vin ||
+    !licensePlate ||
+    !year ||
+    !maker ||
+    !model ||
+    !color ||
+    !email ||
+    !location ||
+    !image
+  ) {
     return res.status(400).json({
-      error: `Missing required fields: ${vin ? "" : "VIN, "} ${licensePlate ? "" : "License Plate, "} ${year ? "" : "Year, "} ${maker ? "" : "Maker, "} ${model ? "" : "Model, "} ${color ? "" : "Color"}`,
+      error: `Missing required fields: ${vin ? "" : "VIN, "} ${licensePlate ? "" : "License Plate, "} ${year ? "" : "Year, "} ${maker ? "" : "Maker, "} ${model ? "" : "Model, "} ${color ? "" : "Color"} ${email ? "" : "Email"} ${location ? "" : "Location"} ${image ? "" : "Image"}`,
       data: null,
     });
   }
@@ -50,6 +61,8 @@ export default async function handler(
         Model: model,
         Color: color,
         email: email,
+        location: location,
+        image: image,
       },
     ])
     .select("*")

@@ -190,6 +190,16 @@ export default function Lookup() {
               key={car.id}
               className="flex flex-col p-4 w-[90vw] md:w-[50%] mx-auto bg-gray-800 border border-gray-700 rounded-lg shadow-md "
             >
+              {car?.image && (
+                <div className="flex justify-start text-base font-bold text-blue-300 mb-10 bg-gray-700">
+                  <img
+                    src={car.image}
+                    alt="car"
+                    className="max-h-[300px] w-full object-contain"
+                  />
+                </div>
+              )}
+
               <div className="grid  gap-4">
                 <div className="flex justify-start text-base font-bold text-blue-300">
                   <span className="w-1/5">VIN:</span>
@@ -219,6 +229,11 @@ export default function Lookup() {
                 <div className="flex justify-start text-base font-bold text-blue-300">
                   <span className="w-1/5">Color:</span>
                   <span className="text-gray-200">{car.Color}</span>
+                </div>
+
+                <div className="flex justify-start text-base font-bold text-blue-300">
+                  <span className="w-1/5">Location:</span>
+                  <span className="text-gray-200">{car.location}</span>
                 </div>
 
                 {car?.email && (
