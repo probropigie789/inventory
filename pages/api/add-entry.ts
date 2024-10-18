@@ -27,7 +27,7 @@ export default async function handler(
   }
 
   // get the body of the request
-  let { vin, licensePlate, year, maker, model, color } = req.body;
+  let { vin, licensePlate, year, maker, model, color, email } = req.body;
 
   // validate the body
   if (!vin || !licensePlate || !year || !maker || !model || !color) {
@@ -49,6 +49,7 @@ export default async function handler(
         Maker: maker,
         Model: model,
         Color: color,
+        email: email,
       },
     ])
     .select("*")

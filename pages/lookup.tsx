@@ -220,6 +220,13 @@ export default function Lookup() {
                   <span className="w-1/5">Color:</span>
                   <span className="text-gray-200">{car.Color}</span>
                 </div>
+
+                {car?.email && (
+                  <div className="flex justify-start text-base font-bold text-blue-300">
+                    <span className="w-1/5">Entry Submitted By :</span>
+                    <span className="text-gray-200">{car.email}</span>
+                  </div>
+                )}
               </div>
 
               <div className="text-right mt-4">

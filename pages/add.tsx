@@ -69,6 +69,7 @@ export default function Add() {
         maker: maker,
         model: model,
         color: color,
+        email: session?.user?.email,
       }),
     })
       .then((res) => res.json())
