@@ -1,5 +1,3 @@
-
-
 ## Cars Inventory
 
 First, install dependencies in the root of the folder.
