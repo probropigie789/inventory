@@ -136,7 +136,7 @@ export default function Lookup() {
           }}
           className="p-2 rounded-full shadow-md border-2 border-green-700 w-max mr-auto"
         >
-          <Plus size={18} strokeWidth={2} color="green" />
+          <Plus size={20} strokeWidth={2} color="green" />
         </button>
         <div className="flex items-center gap-4">
           <div>
@@ -183,7 +183,7 @@ export default function Lookup() {
         </div>
       )}
 
-      <div className="flex flex-1 overflow-auto flex-col py-4 gap-6 w-full mt-4">
+      <div className="flex flex-1 overflow-auto flex-col py-4 gap-6 w-full mt-2">
         {!loading &&
           cars.map((car) => (
             <div
@@ -191,11 +191,11 @@ export default function Lookup() {
               className="flex flex-col p-4 w-[90vw] md:w-[50%] mx-auto bg-gray-800 border border-gray-700 rounded-lg shadow-md "
             >
               {car?.image && (
-                <div className="flex justify-start text-base font-bold text-blue-300 mb-10 bg-gray-700">
+                <div className="flex justify-center text-base font-bold text-blue-300 mb-10">
                   <img
                     src={car.image}
                     alt="car"
-                    className="max-h-[300px] w-full object-contain"
+                    className="max-h-[280px] w-full object-contain border-4 border-gray-700 bg-gray-900 p-2 rounded-lg"
                   />
                 </div>
               )}

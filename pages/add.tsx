@@ -191,7 +191,7 @@ export default function Add() {
           }}
           className="p-2 rounded-full border-2 border-white w-max mr-auto"
         >
-          <Search size={18} strokeWidth={1} color="white" />
+          <Search size={20} strokeWidth={2} color="white" />
         </button>
         <div className="flex items-center gap-4">
           <div>
@@ -333,19 +333,20 @@ export default function Add() {
                 onChange={uploadFile}
                 className="mt-1 block w-full px-3 py-2 border outline-none border-gray-500 bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
               />
+
               {fileUrl && !fileLoading && (
-                <div className="flex items-center relative bg-gray-700 mt-4">
+                <div className="flex min-h-[150px] items-center relative mt-4">
                   <button className="text-white">
                     <XCircle
                       onClick={removeFile}
                       size={30}
-                      className="cursor-pointer absolute right-[10px] top-[10px] bg-black rounded-full"
+                      className="cursor-pointer absolute  z-10 right-[10px] top-[10px] bg-black rounded-full"
                     />
                   </button>
                   <img
                     src={fileUrl}
                     alt="car"
-                    className="w-full object-contain bg-gray-700"
+                    className="w-full object-contain rounded-lg"
                   />
                 </div>
               )}
