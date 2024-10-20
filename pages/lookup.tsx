@@ -236,6 +236,11 @@ export default function Lookup() {
                   <span className="text-gray-200">{car.location}</span>
                 </div>
 
+                <div className="flex justify-start text-base font-bold text-blue-300">
+                  <span className="w-1/5">Price:</span>
+                  <span className="text-gray-200">{car.price}</span>
+                </div>
+
                 {car?.email && (
                   <div className="flex justify-start text-base font-bold text-blue-300">
                     <span className="w-1/5">Entry Submitted By :</span>

@@ -9,7 +9,7 @@ type Data = {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse<Data>
 ) {
   // only allow POST requests
   if (req.method !== "POST") {
@@ -27,8 +27,18 @@ export default async function handler(
   }
 
   // get the body of the request
-  let { vin, licensePlate, year, maker, model, color, email, location, image } =
-    req.body;
+  let {
+    vin,
+    licensePlate,
+    year,
+    maker,
+    model,
+    color,
+    email,
+    location,
+    image,
+    price,
+  } = req.body;
 
   // validate the body
   if (
@@ -40,10 +50,17 @@ export default async function handler(
     !color ||
     !email ||
     !location ||
-    !image
+    !image ||
+    !price
   ) {
     return res.status(400).json({
-      error: `Missing required fields: ${vin ? "" : "VIN, "} ${licensePlate ? "" : "License Plate, "} ${year ? "" : "Year, "} ${maker ? "" : "Maker, "} ${model ? "" : "Model, "} ${color ? "" : "Color"} ${email ? "" : "Email"} ${location ? "" : "Location"} ${image ? "" : "Image"}`,
+      error: `Missing required fields: ${vin ? "" : "VIN, "} ${
+        licensePlate ? "" : "License Plate, "
+      } ${year ? "" : "Year, "} ${maker ? "" : "Maker, "} ${
+        model ? "" : "Model, "
+      } ${color ? "" : "Color"} ${email ? "" : "Email"} ${
+        location ? "" : "Location"
+      } ${image ? "" : "Image"} ${price ? "" : "Price"}`,
       data: null,
     });
   }
@@ -63,6 +80,7 @@ export default async function handler(
         email: email,
         location: location,
         image: image,
+        price: price,
       },
     ])
     .select("*")

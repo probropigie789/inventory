@@ -22,12 +22,13 @@ export default function Add() {
   const [maker, setMaker] = useState("");
   const [model, setModel] = useState("");
   const [color, setColor] = useState("");
+  const [price, setPrice] = useState("");
   const [location, setLocation] = useState("");
   const [fileLoading, setFileLoading] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [fileInputKey, setFileInputKey] = useState<string>(
-    Math.random().toString(36).substring(7),
+    Math.random().toString(36).substring(7)
   );
 
   // get authcontext session context api
@@ -40,7 +41,7 @@ export default function Add() {
     var charactersLength = characters.length;
     for (var i = 0; i < length; i++) {
       result.push(
-        characters.charAt(Math.floor(Math.random() * charactersLength)),
+        characters.charAt(Math.floor(Math.random() * charactersLength))
       );
     }
     return result;
@@ -131,7 +132,8 @@ export default function Add() {
       !maker ||
       !model ||
       !color ||
-      !location
+      !location ||
+      !price
     ) {
       notify("Please fill all the fields", false);
       return;
@@ -157,6 +159,7 @@ export default function Add() {
         email: session?.user?.email,
         location: location,
         image: fileUrl,
+        price: price,
       }),
     })
       .then((res) => res.json())
@@ -174,6 +177,7 @@ export default function Add() {
         setModel("");
         setColor("");
         setLocation("");
+        setPrice("");
         setFileUrl(null);
         setFileName(null);
         setFileInputKey(generateRandomImageFileName(20).join(""));
@@ -304,6 +308,20 @@ export default function Add() {
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="Enter Location"
+                  required
+                  className="mt-1 block w-full px-3 py-2 border outline-none border-gray-500 bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300">
+                  Price
+                </label>
+                <input
+                  type="text"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="Enter Price"
                   required
                   className="mt-1 block w-full px-3 py-2 border outline-none border-gray-500 bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
                 />
