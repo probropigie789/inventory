@@ -188,14 +188,14 @@ export default function Lookup() {
           cars.map((car) => (
             <div
               key={car.id}
-              className="flex flex-col p-4 w-[90vw] md:w-[50%] mx-auto bg-gray-800 border border-gray-700 rounded-lg shadow-md "
+              className="flex flex-col p-2 w-[90vw] md:w-[50%] mx-auto bg-gray-800 border border-gray-700 rounded-lg shadow-md "
             >
               {car?.image && (
                 <div className="flex justify-center text-base font-bold text-blue-300 mb-10">
                   <img
                     src={car.image}
                     alt="car"
-                    className="max-h-[280px] w-full object-contain border-4 border-gray-700 bg-gray-900 p-2 rounded-lg"
+                    className="max-h-[260px] w-full object-contain border-4 border-gray-700 bg-gray-900 p-2 rounded-lg"
                   />
                 </div>
               )}
