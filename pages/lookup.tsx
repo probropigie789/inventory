@@ -27,7 +27,8 @@ export default function Lookup() {
   const [text, setText] = useState<string>("");
   const [refresh, setRefresh] = useState<boolean>(false);
 
-  let { session, isAuthStateLoading } = useContext(AuthContext);
+  let { session, userData, isAdmin, isAuthStateLoading } =
+    useContext(AuthContext);
 
   function notify(message: string, success: boolean) {
     if (success) {
@@ -127,6 +128,45 @@ export default function Lookup() {
     }
   };
 
+  if (isAuthStateLoading || !userData) {
+    return (
+      <div className="relative h-dvh flex flex-col items-center justify-center text-white bg-slate-900 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <CircleDashed
+            size={64}
+            strokeWidth={1}
+            color="white"
+            className="animate-spin"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (userData && userData.is_approved === false && isAdmin === false) {
+    return (
+      <div className="relative h-dvh flex flex-col items-center justify-center text-white bg-slate-900 overflow-hidden">
+        <p className="text-white text-2xl font-bold m-4 text-center mt-auto">
+          Your account is pending approval, please check back later
+        </p>
+        <p className="text-white text-sm font-bold m-4 text-center mb-auto">
+          An admin will review your account shortly
+        </p>
+        <span>
+          <AlertCircle size={64} strokeWidth={1} color="white" />
+        </span>
+
+        <button
+          onClick={() => supabase.auth.signOut()}
+          className="p-2 rounded-full border-2 font-extrabold flex gap-4 mt-auto mb-auto"
+        >
+          Sign Out
+          <LogOut size={18} strokeWidth={2} color="red" />
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="relative h-dvh flex flex-col items-center text-white bg-slate-900 overflow-hidden">
       <div className="p-6 w-full flex flex-col gap-4 md:flex-row md:justify-between">
@@ -140,7 +180,14 @@ export default function Lookup() {
         </button>
         <div className="flex items-center gap-4">
           <div>
-            <UserCircle size={42} strokeWidth={1} />
+            <UserCircle
+              size={42}
+              strokeWidth={1}
+              className="cursor-pointer"
+              onClick={() => {
+                window.location.href = "/profile";
+              }}
+            />
           </div>
           <div className="m-auto">
             <p className="text-white">{session?.user?.email}</p>
@@ -154,16 +201,18 @@ export default function Lookup() {
         </div>
       </div>
 
-      <div className="relative flex items-center">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Search for entry with VIN or License Plate"
-          className="w-[90vw]  md:w-[40vw] lg:w-[30vw] pl-10 pr-3 py-2 border outline-none border-gray-500 bg-gray-700 rounded-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
-        />
-      </div>
+      {(userData.can_view || isAdmin) && (
+        <div className="relative flex items-center">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Search for entry with VIN or License Plate"
+            className="w-[90vw]  md:w-[40vw] lg:w-[30vw] pl-10 pr-3 py-2 border outline-none border-gray-500 bg-gray-700 rounded-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
+          />
+        </div>
+      )}
 
       {loading && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -184,7 +233,18 @@ export default function Lookup() {
       )}
 
       <div className="flex flex-1 overflow-auto flex-col py-4 gap-6 w-full mt-2">
-        {!loading &&
+        {!isAdmin && userData.can_view === false && !loading && (
+          <div className="flex flex-col p-2 max-w-[90vw] mx-auto bg-gray-800 border border-gray-700 rounded-3xl shadow-md my-auto">
+            <div className="flex justify-center text-base font-bold text-blue-300">
+              <p className="text-white">
+                You do not have permission to view entries
+              </p>
+            </div>
+          </div>
+        )}
+
+        {(isAdmin || userData.can_view) &&
+          !loading &&
           cars.map((car) => (
             <div
               key={car.id}
@@ -249,42 +309,46 @@ export default function Lookup() {
                 )}
               </div>
 
-              <div className="text-right mt-4">
-                <button
-                  onClick={async () => {
-                    await deleteCar(car.id);
-                  }}
-                  className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition duration-200 shadow flex ml-auto gap-2 items-center"
-                >
-                  <p>Delete</p>
-                  <Trash size={18} strokeWidth={2} />
-                </button>
-              </div>
+              {(userData.can_delete || isAdmin) && (
+                <div className="text-right mt-4">
+                  <button
+                    onClick={async () => {
+                      await deleteCar(car.id);
+                    }}
+                    className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition duration-200 shadow flex ml-auto gap-2 items-center"
+                  >
+                    <p>Delete</p>
+                    <Trash size={18} strokeWidth={2} />
+                  </button>
+                </div>
+              )}
             </div>
           ))}
       </div>
 
-      <div className="my-4 flex gap-4">
-        <ArrowLeft
-          size={22}
-          strokeWidth={2}
-          color={page > 1 ? "white" : "gray"}
-          className="cursor-pointer"
-          onClick={handlePrev}
-        />
-        <div>
-          <p>
-            Page {page} of {totalPages}
-          </p>
+      {(userData.can_view || isAdmin) && (
+        <div className="my-4 flex gap-4">
+          <ArrowLeft
+            size={22}
+            strokeWidth={2}
+            color={page > 1 ? "white" : "gray"}
+            className="cursor-pointer"
+            onClick={handlePrev}
+          />
+          <div>
+            <p>
+              Page {page} of {totalPages}
+            </p>
+          </div>
+          <ArrowRight
+            size={22}
+            strokeWidth={2}
+            color={page < totalPages ? "white" : "gray"}
+            className="cursor-pointer"
+            onClick={handleNext}
+          />
         </div>
-        <ArrowRight
-          size={22}
-          strokeWidth={2}
-          color={page < totalPages ? "white" : "gray"}
-          className="cursor-pointer"
-          onClick={handleNext}
-        />
-      </div>
+      )}
     </div>
   );
 }

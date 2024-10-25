@@ -7,7 +7,7 @@ function getNextRoute(
   event: AuthChangeEvent,
   session: Session | null,
   currentPath: string,
-  unprotectedRoutes: string[],
+  unprotectedRoutes: string[]
 ): string {
   let next = "";
 
@@ -60,7 +60,7 @@ export default function useAuthSubscription({
         event,
         session,
         window.location.pathname,
-        unprotected,
+        unprotected
       );
       setNextRoute(nextRoutePath);
       setSession(session);
