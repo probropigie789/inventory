@@ -26,9 +26,30 @@ export default function Lookup() {
   const [loading, setLoading] = useState<boolean>(true);
   const [text, setText] = useState<string>("");
   const [refresh, setRefresh] = useState<boolean>(false);
+  const [imageIndex, setImageIndex] = useState<number[]>([]);
 
   let { session, userData, isAdmin, isAuthStateLoading } =
     useContext(AuthContext);
+
+  const handleNextImage = (carIndex: number) => {
+    let currentCar = cars[carIndex];
+    if (imageIndex[carIndex] < currentCar.image.length-1) {
+      let temp = [...imageIndex];
+      let currentIndex = imageIndex[carIndex];
+      temp[carIndex] = currentIndex + 1;
+      setImageIndex(temp);
+    }
+  };
+
+  const handlePrevImage = (carIndex: number) => {
+    let currentCar = cars[carIndex];
+    if (imageIndex[carIndex] > 0) {
+      let temp = [...imageIndex];
+      let currentIndex = imageIndex[carIndex];
+      temp[carIndex] = currentIndex - 1;
+      setImageIndex(temp);
+    }
+  };
 
   function notify(message: string, success: boolean) {
     if (success) {
@@ -79,6 +100,14 @@ export default function Lookup() {
         }, 0); // Defer to the next event loop cycle
       });
   }
+
+  useEffect(() => {
+    if (cars && cars.length > 0) {
+      let size = cars.length;
+      let array = Array(size).fill(0);
+      setImageIndex(array);
+    }
+  },[cars])
 
   useEffect(() => {
     setLoading(true);
@@ -245,22 +274,40 @@ export default function Lookup() {
 
         {(isAdmin || userData.can_view) &&
           !loading &&
-          cars.map((car) => (
+          cars.map((car, carIndex) => (
             <div
               key={car.id}
               className="flex flex-col p-2 w-[90vw] md:w-[50%] mx-auto bg-gray-800 border border-gray-700 rounded-lg shadow-md "
             >
-              {car?.image && (
-                <div className="flex justify-center text-base font-bold text-blue-300 mb-10">
+              {car?.image && Array.isArray(car.image) && car.image.length > 0 && (
+                <div className="relative">
                   <img
-                    src={car.image}
-                    alt="car"
-                    className="max-h-[260px] w-full object-contain border-4 border-gray-700 bg-gray-900 p-2 rounded-lg"
+                    key={carIndex}
+                    src={car.image[imageIndex[carIndex]]}
+                    alt={`Car ${carIndex + 1} Image ${imageIndex[carIndex] + 1}`}
+                    className="max-h-[280px] w-full  object-contain border-4 border-gray-700 bg-gray-900 p-2 rounded-lg"
                   />
+                  <div className="pl-8 absolute top-1/2 left-0 transform -translate-y-1/2">
+                    <button
+                      onClick={() => handlePrevImage(carIndex)}
+                      className="p-2 rounded-full border border-gray-500 hover:bg-gray-600"
+                    >
+                      <ArrowLeft size={20} color="white" />
+                    </button>
+                  </div>
+                  <div className="pr-8 absolute top-1/2 right-0 transform -translate-y-1/2">
+                    <button
+                      onClick={() => handleNextImage(carIndex)}
+                      className="p-2 rounded-full border border-gray-500 hover:bg-gray-600"
+                    >
+                      <ArrowRight size={20} color="white" />
+                    </button>
+                  </div>
                 </div>
+
               )}
 
-              <div className="grid  gap-4">
+              <div className="grid mt-4 p-2 gap-4">
                 <div className="flex justify-start text-base font-bold text-blue-300">
                   <span className="w-1/5">VIN:</span>
                   <span className="w-1/5 text-gray-200">{car.VIN}</span>
@@ -310,7 +357,7 @@ export default function Lookup() {
               </div>
 
               {(userData.can_delete || isAdmin) && (
-                <div className="text-right mt-4">
+                <div className="p-2 mt-2">
                   <button
                     onClick={async () => {
                       await deleteCar(car.id);
