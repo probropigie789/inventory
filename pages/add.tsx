@@ -66,19 +66,13 @@ export default function Add() {
   };
 
   const uploadFile = async (event: any) => {
+    
     const file = event?.target?.files[0];
     if (!file) return;
 
     setFileLoading(true);
 
     const bucket = "assets";
-
-    // if already a file is uploaded, remove it
-    if (fileName) {
-      const { data, error } = await supabase.storage
-        .from(bucket)
-        .remove([fileName]);
-    }
 
     let ext = file.name.split(".").pop();
     let newFileName = generateRandomImageFileName(20).join("") + "." + ext;
@@ -391,7 +385,7 @@ export default function Add() {
 
               <div>
                 <div className="flex items-center gap-1">
-                  <label className="block ml-4 text-sm font-medium text-gray-300">
+                  <label className="block md:ml-4 text-sm font-medium text-gray-300">
                     Image
                   </label>
                   {fileLoading && (
@@ -403,16 +397,17 @@ export default function Add() {
                     />
                   )}
                 </div>
-                <div className="ml-4 ">
+                <div className=" md:ml-4 ">
                   <input
                     type="file"
                     key={fileInputKey}
                     accept="image/*"
                     onChange={uploadFile}
-                    className="mt-1 block w-[316px] px-2 py-2 border outline-none border-gray-500 bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
+                    className=" mt-1 block md:w-[17vw] w-full px-2 py-2 border outline-none border-gray-500 bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
+
                     disabled={fileUrls.length >= 8}
                   />
-                  <div className="flex gap-2 flex-wrap mt-2">
+                  <div className="flex gap-3 flex-wrap mt-2">
                     {fileUrls.map((url, index) => (
                       <div key={index} className="relative w-[100px] h-[100px]">
                         <XCircle
