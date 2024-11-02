@@ -11,7 +11,7 @@ const PAGE_SIZE = 2;
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse<Data>
 ) {
   // only allow POST requests
   if (req.method !== "POST") {
@@ -29,7 +29,7 @@ export default async function handler(
   }
 
   // get the body of the request
-  let { pageNumber, text } = req.body;
+  let { pageNumber, text, isAdmin } = req.body;
 
   // validate the body
   if (!pageNumber) {
@@ -43,17 +43,32 @@ export default async function handler(
 
   const supabase = createClient(req, res);
 
-  // see how many entries are in the database Cars table
-  const { count } = await supabase
+  let countQuery = supabase
     .from("Cars")
-    .select("id", { count: "exact", head: true })
-    .or(`VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%`);
+    .select("id", { count: "exact", head: true });
+
+  if (!isAdmin) {
+    countQuery = countQuery.eq("is_deleted", false);
+  }
+
+  if (text !== "") {
+    countQuery = countQuery.or(
+      `VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%`
+    );
+  }
+
+  // see how many entries are in the database Cars table
+  const { count } = await countQuery;
 
   const numberOfPages = Math.ceil((count as any) / PAGE_SIZE);
   const start = (pageNumber - 1) * PAGE_SIZE;
   const end = start + PAGE_SIZE - 1;
+
   let query = supabase.from("Cars").select("*").range(start, end);
-  console.log(text);
+  if (!isAdmin) {
+    query = query.eq("is_deleted", false);
+  }
+
   if (text !== "") {
     query = query.or(`VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%`);
   }
