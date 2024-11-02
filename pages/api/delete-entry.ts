@@ -40,7 +40,7 @@ export default async function handler(
   let supabase = createClient(req, res);
   const { data, error } = await supabase
     .from("Cars")
-    .delete()
+    .update({ is_deleted: true })
     .eq("id", id)
     .select("*");
 
