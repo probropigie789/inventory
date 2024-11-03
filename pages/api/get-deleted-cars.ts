@@ -78,6 +78,8 @@ export default async function handler(
     });
   }
 
+  console.log(data, error);
+
   return res.status(200).json({
     error: null,
     data: {

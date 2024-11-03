@@ -69,6 +69,8 @@ export default function Lookup() {
         body: JSON.stringify({ pageNumber: page, text, isAdmin }),
       });
 
+      console.log("response", response);
+
       if (!response.ok) throw new Error("Failed to fetch deleted cars.");
 
       const body = await response.json();
