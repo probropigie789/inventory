@@ -176,7 +176,7 @@ export default function Lookup() {
             className={`px-4 py-2 rounded-lg ${activeTab === "deleted" ? "bg-blue-600" : "bg-gray-700"
               } text-white`}
           >
-            Deleted Cars
+            
           </button>
         </div>
       )}
