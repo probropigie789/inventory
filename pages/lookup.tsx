@@ -4,12 +4,14 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
+  Check,
   CircleDashed,
   LogOut,
   Plus,
   Search,
   Trash,
   UserCircle,
+  XIcon,
 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -21,10 +23,11 @@ export default function Lookup() {
   const [totalPages, setTotalPages] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [text, setText] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<"all" | "deleted">("all");
   const [imageIndex, setImageIndex] = useState<{ [key: number]: number }>({});
 
-  const { session, userData, isAdmin, isAuthStateLoading } = useContext(AuthContext);
+  const { session, userData, isAdmin, isAuthStateLoading } =
+    useContext(AuthContext);
 
   const notify = (message: string, success: boolean) => {
     toast[success ? "success" : "error"](message, {
@@ -48,10 +51,10 @@ export default function Lookup() {
       const body = await response.json();
       setCars(body.data.cars || []);
       setTotalPages(body.data.maxPages || 1);
-      setLoading(false);  // Ensure loading is set to false after fetching
+      setLoading(false); // Ensure loading is set to false after fetching
     } catch (error) {
       console.error("Error fetching entries:", error);
-      setLoading(false);  // Set loading to false in case of an error
+      setLoading(false); // Set loading to false in case of an error
       notify("Error loading entries. Please try again.", false);
     }
   };
@@ -63,21 +66,24 @@ export default function Lookup() {
       const response = await fetch("/api/get-deleted-cars", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageNumber: page, text, isAdmin }),
       });
+
+      console.log("response", response);
 
       if (!response.ok) throw new Error("Failed to fetch deleted cars.");
 
       const body = await response.json();
-      setDeletedCars(body.data || []);
+      setDeletedCars(body.data.cars || []);
+      setTotalPages(body.data.maxPages || 1);
+      setLoading(false); // Ensure loading is set to false after fetching
     } catch (error) {
       console.error("Error fetching deleted cars:", error);
       notify("Error loading deleted cars. Please try again.", false);
     } finally {
-      setLoading(false);  
+      setLoading(false);
     }
   };
-
-  console.log("deleted cars", deletedCars)
 
   const deleteCar = async (id: any) => {
     try {
@@ -111,11 +117,15 @@ export default function Lookup() {
   };
 
   useEffect(() => {
-    fetchEntries();
-    fetchDeletedCars();
-  }, [page, text, isAdmin]);
+    console.log("deleted cars", deletedCars);
+  }, [deletedCars]);
 
-  const handleTabChange = (tab: string) => {
+  useEffect(() => {
+    if (activeTab === "all") fetchEntries();
+    else fetchDeletedCars();
+  }, [page, text, isAdmin, activeTab]);
+
+  const handleTabChange = (tab: "all" | "deleted") => {
     setActiveTab(tab);
     setPage(1);
   };
@@ -131,7 +141,12 @@ export default function Lookup() {
   if (isAuthStateLoading || !userData) {
     return (
       <div className="relative h-dvh flex items-center justify-center text-white bg-slate-900">
-        <CircleDashed size={64} strokeWidth={1} color="white" className="animate-spin" />
+        <CircleDashed
+          size={64}
+          strokeWidth={1}
+          color="white"
+          className="animate-spin"
+        />
       </div>
     );
   }
@@ -166,15 +181,17 @@ export default function Lookup() {
         <div className="flex justify-center gap-4 mt-4">
           <button
             onClick={() => handleTabChange("all")}
-            className={`px-4 py-2 rounded-lg ${activeTab === "all" ? "bg-blue-600" : "bg-gray-700"
-              } text-white`}
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === "all" ? "bg-blue-600" : "bg-gray-700"
+            } text-white`}
           >
             All Cars
           </button>
           <button
             onClick={() => handleTabChange("deleted")}
-            className={`px-4 py-2 rounded-lg ${activeTab === "deleted" ? "bg-blue-600" : "bg-gray-700"
-              } text-white`}
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === "deleted" ? "bg-blue-600" : "bg-gray-700"
+            } text-white`}
           >
             
           </button>
@@ -194,9 +211,27 @@ export default function Lookup() {
         </div>
       )}
 
+      {(userData.can_view || isAdmin) && activeTab === "deleted" && (
+        <div className="relative mt-2 flex items-center">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Search for deleted entry with VIN or License Plate"
+            className="w-[90vw] md:w-[40vw] lg:w-[30vw] pl-10 pr-3 py-2 border outline-none border-gray-500 bg-gray-700 rounded-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
+          />
+        </div>
+      )}
+
       {loading && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <CircleDashed size={64} strokeWidth={1} color="white" className="animate-spin" />
+          <CircleDashed
+            size={64}
+            strokeWidth={1}
+            color="white"
+            className="animate-spin"
+          />
         </div>
       )}
 
@@ -220,8 +255,90 @@ export default function Lookup() {
 
         {(isAdmin || userData.can_view) &&
           !loading &&
+          activeTab === "all" &&
           cars.map((car, carIndex) => (
-            <div key={car.id} className="flex flex-col p-2 w-[90vw] md:w-[50%] mx-auto bg-gray-800 border border-gray-700 rounded-lg shadow-md mt-4">
+            <div
+              key={car.id}
+              className="flex flex-col p-2 w-[90vw] md:w-[50%] mx-auto bg-gray-800 border border-gray-700 rounded-lg shadow-md mt-4"
+            >
+              {car?.image && car.image.length > 0 && (
+                <div className="relative">
+                  <img
+                    src={car.image[imageIndex[carIndex] || 0]}
+                    alt={`Car ${carIndex + 1}`}
+                    className="max-h-[170px] md:max-h-[280px] w-full object-contain border-4 border-gray-700 bg-gray-900 p-4 md:p-2 rounded-lg"
+                  />
+                  <div className="absolute top-1/2 left-2 -translate-y-1/2">
+                    <button
+                      onClick={() => handleImageChange(carIndex, "prev")}
+                      className="p-2 rounded-full border border-gray-500 hover:bg-gray-600"
+                    >
+                      <ArrowLeft size={20} color="white" />
+                    </button>
+                  </div>
+                  <div className="absolute top-1/2 right-2 -translate-y-1/2">
+                    <button
+                      onClick={() => handleImageChange(carIndex, "next")}
+                      className="p-2 rounded-full border border-gray-500 hover:bg-gray-600"
+                    >
+                      <ArrowRight size={20} color="white" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid mt-4 p-2 gap-4">
+                {[
+                  { label: "VIN", value: car.VIN },
+                  { label: "License Plate", value: car.LicensePlate },
+                  { label: "Year", value: car.Year },
+                  { label: "Maker", value: car.Maker },
+                  { label: "Model", value: car.Model },
+                  { label: "Color", value: car.Color },
+                  { label: "Location", value: car.location },
+                  { label: "Price", value: car.price },
+                  car?.email && { label: "Submitted By", value: car.email },
+                  isAdmin && {
+                    label: "deleted",
+                    value: car.is_deleted ? <Check /> : <XIcon />,
+                  },
+                ]
+                  .filter(Boolean)
+                  .map(({ label, value }, index) => (
+                    <div
+                      key={index}
+                      className="flex flex-row justify-start text-sm md:text-base font-bold text-blue-300"
+                    >
+                      <span className="w-full md:w-1/5">{label}:</span>
+                      <span className="w-full md:w-1/5 text-gray-200">
+                        {value}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+
+              {(userData.can_delete || isAdmin) && (
+                <div className="p-2 mt-2">
+                  <button
+                    onClick={() => deleteCar(car.id)}
+                    className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition duration-200 shadow flex ml-auto gap-2 items-center"
+                  >
+                    <Trash size={18} strokeWidth={2} />
+                    <p>Delete</p>
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+
+        {isAdmin &&
+          !loading &&
+          activeTab === "deleted" &&
+          deletedCars?.map((car, carIndex) => (
+            <div
+              key={car.id}
+              className="flex flex-col p-2 w-[90vw] md:w-[50%] mx-auto bg-gray-800 border border-gray-700 rounded-lg shadow-md mt-4"
+            >
               {car?.image && car.image.length > 0 && (
                 <div className="relative">
                   <img
@@ -262,13 +379,18 @@ export default function Lookup() {
                 ]
                   .filter(Boolean)
                   .map(({ label, value }, index) => (
-                    <div key={index} className="flex flex-row justify-start text-sm md:text-base font-bold text-blue-300">
+                    <div
+                      key={index}
+                      className="flex flex-row justify-start text-sm md:text-base font-bold text-blue-300"
+                    >
                       <span className="w-full md:w-1/5">{label}:</span>
-                      <span className="w-full md:w-1/5 text-gray-200">{value}</span>
+                      <span className="w-full md:w-1/5 text-gray-200">
+                        {value}
+                      </span>
                     </div>
                   ))}
               </div>
-
+              {/* 
               {(userData.can_delete || isAdmin) && (
                 <div className="p-2 mt-2">
                   <button
@@ -279,12 +401,10 @@ export default function Lookup() {
                     <p>Delete</p>
                   </button>
                 </div>
-              )}
+              )} */}
             </div>
           ))}
       </div>
-
-
 
       {/* Pagination */}
       {(userData.can_view || isAdmin) && (
@@ -296,7 +416,9 @@ export default function Lookup() {
             className="cursor-pointer"
             onClick={handlePrev}
           />
-          <p>Page {page} of {totalPages}</p>
+          <p>
+            Page {page} of {totalPages}
+          </p>
           <ArrowRight
             size={22}
             strokeWidth={2}
