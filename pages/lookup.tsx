@@ -297,7 +297,8 @@ export default function Lookup() {
                   { label: "Color", value: car.Color },
                   { label: "Location", value: car.location },
                   { label: "Price", value: car.price },
-                  car?.email && { label: "Submitted By", value: car.email },
+                  { label: "Lot", value: car.lot },
+                  car?.user && { label: "Submitted By", value: car.user },
                   isAdmin && {
                     label: "deleted",
                     value: car.is_deleted ? <Check /> : <XIcon />,
@@ -375,7 +376,7 @@ export default function Lookup() {
                   { label: "Color", value: car.Color },
                   { label: "Location", value: car.location },
                   { label: "Price", value: car.price },
-                  car?.email && { label: "Submitted By", value: car.email },
+                  car?.user && { label: "Submitted By", value: car.user },
                 ]
                   .filter(Boolean)
                   .map(({ label, value }, index) => (

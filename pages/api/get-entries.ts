@@ -53,7 +53,7 @@ export default async function handler(
 
   if (text !== "") {
     countQuery = countQuery.or(
-      `VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%`
+      `VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%,Maker.ilike.%${text}%,Model.ilike.%${text}%,Color.ilike.%${text}%,email.ilike.%${text}%,location.ilike.%${text}%,price.ilike.%${text}%,lot.ilike.%${text}%`
     );
   }
 
@@ -70,7 +70,9 @@ export default async function handler(
   }
 
   if (text !== "") {
-    query = query.or(`VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%`);
+    query = query.or(
+      `VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%,Maker.ilike.%${text}%,Model.ilike.%${text}%,Color.ilike.%${text}%,email.ilike.%${text}%,location.ilike.%${text}%,price.ilike.%${text}%,lot.ilike.%${text}%`
+    );
   }
   // get the entries from the database
   const { data, error } = await query;

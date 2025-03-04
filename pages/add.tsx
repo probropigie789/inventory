@@ -24,6 +24,7 @@ export default function Add() {
   const [model, setModel] = useState("");
   const [color, setColor] = useState("");
   const [price, setPrice] = useState("");
+  const [lot, setLot] = useState("");
   const [location, setLocation] = useState("");
   const [fileLoading, setFileLoading] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -66,7 +67,6 @@ export default function Add() {
   };
 
   const uploadFile = async (event: any) => {
-    
     const file = event?.target?.files[0];
     if (!file) return;
 
@@ -131,7 +131,8 @@ export default function Add() {
       !model ||
       !color ||
       !location ||
-      !price
+      !price ||
+      !lot
     ) {
       notify("Please fill all the fields", false);
       return;
@@ -158,6 +159,7 @@ export default function Add() {
         location: location,
         image: fileUrls,
         price: price,
+        lot: lot,
       }),
     })
       .then((res) => res.json())
@@ -381,6 +383,19 @@ export default function Add() {
                     className="mt-1 block w-full px-3 py-2 border outline-none border-gray-500 bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300">
+                    Lot
+                  </label>
+                  <input
+                    type="text"
+                    value={lot}
+                    onChange={(e) => setLot(e.target.value)}
+                    placeholder="Enter Lot"
+                    required
+                    className="mt-1 block w-full px-3 py-2 border outline-none border-gray-500 bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
+                  />
+                </div>
               </div>
 
               <div>
@@ -404,7 +419,6 @@ export default function Add() {
                     accept="image/*"
                     onChange={uploadFile}
                     className=" mt-1 block md:w-[17vw] w-full px-2 py-2 border outline-none border-gray-500 bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
-
                     disabled={fileUrls.length >= 8}
                   />
                   <div className="flex gap-3 flex-wrap mt-2">
@@ -416,7 +430,11 @@ export default function Add() {
                           onClick={() => removeFile(index)}
                           className="cursor-pointer absolute top-1 right-1"
                         />
-                        <img src={url} alt="car" className="w-full h-full object-cover rounded" />
+                        <img
+                          src={url}
+                          alt="car"
+                          className="w-full h-full object-cover rounded"
+                        />
                       </div>
                     ))}
                   </div>

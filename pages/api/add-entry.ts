@@ -38,6 +38,7 @@ export default async function handler(
     location,
     image,
     price,
+    lot,
   } = req.body;
 
   // validate the body
@@ -51,7 +52,8 @@ export default async function handler(
     !email ||
     !location ||
     !image ||
-    !price
+    !price ||
+    !lot
   ) {
     return res.status(400).json({
       error: `Missing required fields: ${vin ? "" : "VIN, "} ${
@@ -60,7 +62,7 @@ export default async function handler(
         model ? "" : "Model, "
       } ${color ? "" : "Color"} ${email ? "" : "Email"} ${
         location ? "" : "Location"
-      } ${image ? "" : "Image"} ${price ? "" : "Price"}`,
+      } ${image ? "" : "Image"} ${price ? "" : "Price"} ${lot ? "" : "Lot"}`,
       data: null,
     });
   }
@@ -77,10 +79,11 @@ export default async function handler(
         Maker: maker,
         Model: model,
         Color: color,
-        email: email,
+        user: email,
         location: location,
         image: image,
         price: price,
+        lot: lot,
       },
     ])
     .select("*")
