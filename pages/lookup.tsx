@@ -193,7 +193,7 @@ export default function Lookup() {
               activeTab === "deleted" ? "bg-blue-600" : "bg-gray-700"
             } text-white`}
           >
-            
+            Deleted Cars
           </button>
         </div>
       )}
