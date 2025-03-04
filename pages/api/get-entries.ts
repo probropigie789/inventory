@@ -7,7 +7,7 @@ type Data = {
   data: any;
 };
 
-const PAGE_SIZE = 2;
+const PAGE_SIZE = 20;
 
 export default async function handler(
   req: NextApiRequest,
