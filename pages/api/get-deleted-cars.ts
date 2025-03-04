@@ -50,7 +50,7 @@ export default async function handler(
 
   if (text !== "") {
     countQuery = countQuery.or(
-      `VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%,Maker.ilike.%${text}%,Model.ilike.%${text}%,Color.ilike.%${text}%,email.ilike.%${text}%,location.ilike.%${text}%,price.ilike.%${text}%,lot.ilike.%${text}%`
+      `VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%,Maker.ilike.%${text}%,Model.ilike.%${text}%,Color.ilike.%${text}%,user.ilike.%${text}%,location.ilike.%${text}%,price.ilike.%${text}%,lot.ilike.%${text}%`
     );
   }
   // see how many entries are in the database Cars table
@@ -67,7 +67,7 @@ export default async function handler(
 
   if (text !== "") {
     query = query.or(
-      `VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%,Maker.ilike.%${text}%,Model.ilike.%${text}%,Color.ilike.%${text}%,email.ilike.%${text}%,location.ilike.%${text}%,price.ilike.%${text}%,lot.ilike.%${text}%`
+      `VIN.ilike.%${text}%,LicensePlate.ilike.%${text}%,Maker.ilike.%${text}%,Model.ilike.%${text}%,Color.ilike.%${text}%,user.ilike.%${text}%,location.ilike.%${text}%,price.ilike.%${text}%,lot.ilike.%${text}%`
     );
   }
   // get the entries from the database

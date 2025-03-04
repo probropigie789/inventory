@@ -11,10 +11,157 @@ import {
   Search,
   Trash,
   UserCircle,
+  X,
   XIcon,
 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+
+function DeletedCarsTable({
+  deletedCars,
+  isAdmin,
+  loading,
+}: {
+  deletedCars: any[];
+  isAdmin: boolean;
+  loading: boolean;
+}) {
+  const [selectedCar, setSelectedCar] = useState(null);
+  const [imageIndex, setImageIndex] = useState({});
+
+  const handleImageChange = (carIndex: number, direction: "prev" | "next") => {
+    setImageIndex((prev) => {
+      // @ts-ignore
+      const currentIndex = prev[carIndex] || 0;
+      let newIndex;
+
+      if (!deletedCars[carIndex]?.image) {
+        return prev;
+      }
+
+      direction === "next"
+        ? (currentIndex + 1) % deletedCars[carIndex].image.length
+        : (currentIndex - 1 + deletedCars[carIndex].image.length) %
+          deletedCars[carIndex].image.length;
+      return { ...prev, [carIndex]: newIndex };
+    });
+  };
+
+  return (
+    <div className="p-4">
+      <table className="w-full text-left border-collapse border border-gray-700">
+        <thead>
+          <tr className="bg-gray-800 text-blue-300">
+            {[
+              "VIN",
+              "License Plate",
+              "Year",
+              "Maker",
+              "Model",
+              "Color",
+              "Location",
+              "Price",
+              "Submitted By",
+            ].map((header) => (
+              <th key={header} className="border border-gray-700 p-2">
+                {header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {isAdmin &&
+            !loading &&
+            deletedCars?.map((car, index) => (
+              <tr
+                key={car.id}
+                className="cursor-pointer hover:bg-gray-700 border border-gray-700"
+                onClick={() => setSelectedCar(car)}
+              >
+                <td className="p-2">{car.VIN}</td>
+                <td className="p-2">{car.LicensePlate}</td>
+                <td className="p-2">{car.Year}</td>
+                <td className="p-2">{car.Maker}</td>
+                <td className="p-2">{car.Model}</td>
+                <td className="p-2">{car.Color}</td>
+                <td className="p-2">{car.location}</td>
+                <td className="p-2">{car.price}</td>
+                <td className="p-2">{car.user}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+
+      {selectedCar && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedCar(null);
+          }}
+        >
+          <div className="bg-gray-800 p-4 rounded-lg shadow-lg max-w-lg w-full">
+            <button
+              className="absolute top-4 right-4"
+              onClick={() => setSelectedCar(null)}
+            >
+              <X size={24} color="white" />
+            </button>
+            {selectedCar?.image && selectedCar.image.length > 0 && (
+              <div className="relative">
+                <img
+                  src={selectedCar.image[imageIndex[selectedCar.id] || 0]}
+                  alt={selectedCar.Model}
+                  className="w-full object-contain max-h-60 border-4 border-gray-700 bg-gray-900 p-2 rounded-lg"
+                />
+                <button
+                  onClick={() => handleImageChange(selectedCar.id, "prev")}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full border border-gray-500 hover:bg-gray-600"
+                >
+                  <ArrowLeft size={20} color="white" />
+                </button>
+                <button
+                  onClick={() => handleImageChange(selectedCar.id, "next")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full border border-gray-500 hover:bg-gray-600"
+                >
+                  <ArrowRight size={20} color="white" />
+                </button>
+              </div>
+            )}
+            <div className="mt-4 text-blue-300">
+              <p>
+                <strong>VIN:</strong> {selectedCar.VIN}
+              </p>
+              <p>
+                <strong>License Plate:</strong> {selectedCar.LicensePlate}
+              </p>
+              <p>
+                <strong>Year:</strong> {selectedCar.Year}
+              </p>
+              <p>
+                <strong>Maker:</strong> {selectedCar.Maker}
+              </p>
+              <p>
+                <strong>Model:</strong> {selectedCar.Model}
+              </p>
+              <p>
+                <strong>Color:</strong> {selectedCar.Color}
+              </p>
+              <p>
+                <strong>Location:</strong> {selectedCar.location}
+              </p>
+              <p>
+                <strong>Price:</strong> {selectedCar.price}
+              </p>
+              <p>
+                <strong>Submitted By:</strong> {selectedCar.user}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Lookup() {
   const [page, setPage] = useState<number>(1);
@@ -335,76 +482,13 @@ export default function Lookup() {
         {isAdmin &&
           !loading &&
           activeTab === "deleted" &&
-          deletedCars?.map((car, carIndex) => (
-            <div
-              key={car.id}
-              className="flex flex-col p-2 w-[90vw] md:w-[50%] mx-auto bg-gray-800 border border-gray-700 rounded-lg shadow-md mt-4"
-            >
-              {car?.image && car.image.length > 0 && (
-                <div className="relative">
-                  <img
-                    src={car.image[imageIndex[carIndex] || 0]}
-                    alt={`Car ${carIndex + 1}`}
-                    className="max-h-[170px] md:max-h-[280px] w-full object-contain border-4 border-gray-700 bg-gray-900 p-4 md:p-2 rounded-lg"
-                  />
-                  <div className="absolute top-1/2 left-2 -translate-y-1/2">
-                    <button
-                      onClick={() => handleImageChange(carIndex, "prev")}
-                      className="p-2 rounded-full border border-gray-500 hover:bg-gray-600"
-                    >
-                      <ArrowLeft size={20} color="white" />
-                    </button>
-                  </div>
-                  <div className="absolute top-1/2 right-2 -translate-y-1/2">
-                    <button
-                      onClick={() => handleImageChange(carIndex, "next")}
-                      className="p-2 rounded-full border border-gray-500 hover:bg-gray-600"
-                    >
-                      <ArrowRight size={20} color="white" />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="grid mt-4 p-2 gap-4">
-                {[
-                  { label: "VIN", value: car.VIN },
-                  { label: "License Plate", value: car.LicensePlate },
-                  { label: "Year", value: car.Year },
-                  { label: "Maker", value: car.Maker },
-                  { label: "Model", value: car.Model },
-                  { label: "Color", value: car.Color },
-                  { label: "Location", value: car.location },
-                  { label: "Price", value: car.price },
-                  car?.user && { label: "Submitted By", value: car.user },
-                ]
-                  .filter(Boolean)
-                  .map(({ label, value }, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-row justify-start text-sm md:text-base font-bold text-blue-300"
-                    >
-                      <span className="w-full md:w-1/5">{label}:</span>
-                      <span className="w-full md:w-1/5 text-gray-200">
-                        {value}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-              {/* 
-              {(userData.can_delete || isAdmin) && (
-                <div className="p-2 mt-2">
-                  <button
-                    onClick={() => deleteCar(car.id)}
-                    className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition duration-200 shadow flex ml-auto gap-2 items-center"
-                  >
-                    <Trash size={18} strokeWidth={2} />
-                    <p>Delete</p>
-                  </button>
-                </div>
-              )} */}
-            </div>
-          ))}
+          deletedCars.length > 0 && (
+            <DeletedCarsTable
+              deletedCars={deletedCars}
+              isAdmin={isAdmin}
+              loading={loading}
+            />
+          )}
       </div>
 
       {/* Pagination */}
