@@ -1,4 +1,20 @@
 import { supabase } from "@/Database/uiClient";
+
+type Car = {
+  id: number;
+  VIN: string;
+  LicensePlate: string;
+  Year: number;
+  Maker: string;
+  Model: string;
+  Color: string;
+  location: string;
+  price: number;
+  lot: string;
+  user: string;
+  is_deleted: boolean;
+  image: string[];
+};
 import { AuthContext } from "@/Providers/AuthProvider";
 import {
   AlertCircle,
@@ -24,12 +40,14 @@ function CarsTable({
   loading,
   onDeleteCar,
 }: {
+
   cars: Car[];
   isAdmin: boolean;
   userData: any;
   loading: boolean;
   onDeleteCar: (id: any) => void;
-}) {
+  }) {
+ 
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [selectedCarIndex, setSelectedCarIndex] = useState<number | null>(null);
   const [imageIndex, setImageIndex] = useState<Record<number, number>>({});
@@ -159,7 +177,6 @@ function CarsTable({
                 </div>
               </div>
             )}
-
             {/* Car Details */}
             <div className="grid mt-6 p-2 gap-4">
               {[
@@ -172,13 +189,10 @@ function CarsTable({
                 { label: "Location", value: selectedCar.location },
                 { label: "Price", value: selectedCar.price },
                 { label: "Lot", value: selectedCar.lot },
-                selectedCar?.user && { label: "Submitted By", value: selectedCar.user },
-                isAdmin && {
-                  label: "Deleted",
-                  value: selectedCar.is_deleted ? <Check /> : <XIcon />,
-                },
+                selectedCar?.user ? { label: "Submitted By", value: selectedCar.user } : null,
+                isAdmin ? { label: "Deleted", value: selectedCar.is_deleted ? <Check /> : <XIcon /> } : null,
               ]
-                .filter(Boolean)
+                .filter((item) => item !== null) // Explicitly filter out null values
                 .map(({ label, value }, index) => (
                   <div
                     key={index}
@@ -210,19 +224,16 @@ function CarsTable({
 }
 
 
-
-
 function DeletedCarsTable({
   deletedCars,
   isAdmin,
   loading,
 }: {
-  //@ts-ignore
+
   deletedCars: Car[];
   isAdmin: boolean;
   loading: boolean;
   }) {
-  //@ts-ignore
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [selectedCarIndex, setSelectedCarIndex] = useState<number | null>(null);
   const [imageIndex, setImageIndex] = useState<Record<number, number>>({});
@@ -245,8 +256,8 @@ function DeletedCarsTable({
   };
 
   return (
-    <div className="p-4">
-      <table className="w-full text-left border-collapse border border-gray-700">
+    <div className="p-4 flex justify-center items-center">
+      <table className="w-[80vw] text-left border-collapse border border-gray-700">
         <thead>
           <tr className="bg-gray-800 text-blue-300">
             {[
@@ -293,7 +304,7 @@ function DeletedCarsTable({
             if (e.target === e.currentTarget) setSelectedCar(null);
           }}
         >
-          <div className="bg-gray-800 p-4 rounded-lg shadow-lg max-w-lg w-full relative">
+          <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-2xl w-full relative">
             <button
               className="absolute top-4 right-4"
               onClick={() => setSelectedCar(null)}
@@ -503,7 +514,7 @@ export default function Lookup() {
       </div>
 
       {isAdmin && (
-        <div className="flex justify-center gap-4 mt-4">
+        <div className="flex justify-center gap-4 mt-4 mb-2">
           <button
             onClick={() => handleTabChange("all")}
             className={`px-4 py-2 rounded-lg ${
