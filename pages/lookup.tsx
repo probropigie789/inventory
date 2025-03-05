@@ -17,32 +17,229 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
+function CarsTable({
+  cars,
+  isAdmin,
+  userData,
+  loading,
+  onDeleteCar,
+}: {
+  cars: Car[];
+  isAdmin: boolean;
+  userData: any;
+  loading: boolean;
+  onDeleteCar: (id: any) => void;
+}) {
+  const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+  const [selectedCarIndex, setSelectedCarIndex] = useState<number | null>(null);
+  const [imageIndex, setImageIndex] = useState<Record<number, number>>({});
+
+  const handleImageChange = (carIndex: number, direction: "prev" | "next") => {
+    setImageIndex((prev) => {
+      const currentIndex = prev[carIndex] || 0;
+      if (!cars[carIndex]?.image) return prev;
+
+      const newIndex =
+        direction === "next"
+          ? (currentIndex + 1) % cars[carIndex].image.length
+          : (currentIndex - 1 + cars[carIndex].image.length) %
+          cars[carIndex].image.length;
+
+      return { ...prev, [carIndex]: newIndex };
+    });
+  };
+
+  const handleDelete = (carId: number) => {
+    onDeleteCar(carId);
+    setSelectedCar(null); // Close the modal after delete
+  };
+
+  return (
+    <div className="p-4 flex justify-center items-center">
+      <table className="w-[80vw] text-left border-collapse border border-gray-700">
+        <thead>
+          <tr className="bg-gray-800 text-blue-300">
+            {[
+              "VIN",
+              "License Plate",
+              "Year",
+              "Maker",
+              "Model",
+              isAdmin ? "Deleted" : null,
+              "Submitted By",
+            ]
+              .filter(Boolean)
+              .map((header, index) => (
+                <th key={header} className="border-r border-gray-700 p-2">
+                  {header}
+                </th>
+              ))}
+          </tr>
+        </thead>
+        <tbody>
+          {isAdmin || userData.can_view
+            ? cars?.map((car, index) => (
+              <tr
+                key={car.id}
+                className="cursor-pointer hover:bg-gray-700 border border-gray-700"
+                onClick={() => {
+                  setSelectedCar(car);
+                  setSelectedCarIndex(index);
+                }}
+              >
+                <td className="p-2 border-r border-gray-700 max-w-[150px] overflow-hidden text-ellipsis">
+                  {car.VIN}
+                </td>
+                <td className="p-2 border-r border-gray-700 max-w-[150px] overflow-hidden text-ellipsis">
+                  {car.LicensePlate}
+                </td>
+                <td className="p-2 border-r border-gray-700 max-w-[100px] overflow-hidden text-ellipsis">
+                  {car.Year}
+                </td>
+                <td className="p-2 border-r border-gray-700 max-w-[150px] overflow-hidden text-ellipsis">
+                  {car.Maker}
+                </td>
+                <td className="p-2 border-r border-gray-700 max-w-[150px] overflow-hidden text-ellipsis">
+                  {car.Model}
+                </td>
+                {isAdmin && (
+                  <td className="p-2 border-r border-gray-700 max-w-[100px] overflow-hidden text-ellipsis">
+                    {car.is_deleted ? <Check /> : <XIcon />}
+                  </td>
+                )}
+                <td className="p-2 max-w-[150px] overflow-hidden text-ellipsis">
+                  {car.user}
+                </td>
+              </tr>
+            ))
+            : null}
+        </tbody>
+      </table>
+
+
+      {selectedCar && selectedCarIndex !== null && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedCar(null);
+          }}
+        >
+          <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-2xl w-full relative">
+            <button
+              className="absolute top-2 right-2 text-white text-base p-1 rounded-full bg-gray-700 hover:bg-gray-600"
+              onClick={() => setSelectedCar(null)}
+            >
+             <X size={18} color="white" />
+            </button>
+
+
+            {/* Image Section */}
+            {selectedCar.image && selectedCar.image.length > 0 && (
+              <div className="relative">
+                <img
+                  src={selectedCar.image[imageIndex[selectedCarIndex] || 0]}
+                  alt={selectedCar.Model}
+                  className="max-h-[200px] w-full object-contain border-4 border-gray-700 bg-gray-900 p-4 md:p-2 rounded-lg"
+                />
+                <div className="absolute top-1/2 left-2 -translate-y-1/2">
+                  <button
+                    onClick={() => handleImageChange(selectedCarIndex, "prev")}
+                    className="p-2 rounded-full border border-gray-500 hover:bg-gray-600"
+                  >
+                    <ArrowLeft size={20} color="white" />
+                  </button>
+                </div>
+                <div className="absolute top-1/2 right-2 -translate-y-1/2">
+                  <button
+                    onClick={() => handleImageChange(selectedCarIndex, "next")}
+                    className="p-2 rounded-full border border-gray-500 hover:bg-gray-600"
+                  >
+                    <ArrowRight size={20} color="white" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Car Details */}
+            <div className="grid mt-6 p-2 gap-4">
+              {[
+                { label: "VIN", value: selectedCar.VIN },
+                { label: "License Plate", value: selectedCar.LicensePlate },
+                { label: "Year", value: selectedCar.Year },
+                { label: "Maker", value: selectedCar.Maker },
+                { label: "Model", value: selectedCar.Model },
+                { label: "Color", value: selectedCar.Color },
+                { label: "Location", value: selectedCar.location },
+                { label: "Price", value: selectedCar.price },
+                { label: "Lot", value: selectedCar.lot },
+                selectedCar?.user && { label: "Submitted By", value: selectedCar.user },
+                isAdmin && {
+                  label: "Deleted",
+                  value: selectedCar.is_deleted ? <Check /> : <XIcon />,
+                },
+              ]
+                .filter(Boolean)
+                .map(({ label, value }, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-row justify-start text-sm md:text-base font-bold text-blue-300"
+                  >
+                    <span className="w-full md:w-1/5">{label}:</span>
+                    <span className="w-full md:w-1/5 text-gray-200">{value}</span>
+                  </div>
+                ))}
+            </div>
+
+            {/* Delete Button */}
+            {(userData.can_delete || isAdmin) && (
+              <div className="p-2 mt-2">
+                <button
+                  onClick={() => handleDelete(selectedCar.id)}
+                  className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition duration-200 shadow flex ml-auto gap-2 items-center"
+                >
+                  <Trash size={18} strokeWidth={2} />
+                  <p>Delete</p>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+
 function DeletedCarsTable({
   deletedCars,
   isAdmin,
   loading,
 }: {
-  deletedCars: any[];
+  //@ts-ignore
+  deletedCars: Car[];
   isAdmin: boolean;
   loading: boolean;
-}) {
-  const [selectedCar, setSelectedCar] = useState(null);
-  const [imageIndex, setImageIndex] = useState({});
+  }) {
+  //@ts-ignore
+  const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+  const [selectedCarIndex, setSelectedCarIndex] = useState<number | null>(null);
+  const [imageIndex, setImageIndex] = useState<Record<number, number>>({});
 
   const handleImageChange = (carIndex: number, direction: "prev" | "next") => {
     setImageIndex((prev) => {
-      // @ts-ignore
       const currentIndex = prev[carIndex] || 0;
       let newIndex;
 
-      if (!deletedCars[carIndex]?.image) {
-        return prev;
-      }
+      if (!deletedCars[carIndex]?.image) return prev;
 
-      direction === "next"
-        ? (currentIndex + 1) % deletedCars[carIndex].image.length
-        : (currentIndex - 1 + deletedCars[carIndex].image.length) %
+      newIndex =
+        direction === "next"
+          ? (currentIndex + 1) % deletedCars[carIndex].image.length
+          : (currentIndex - 1 + deletedCars[carIndex].image.length) %
           deletedCars[carIndex].image.length;
+
       return { ...prev, [carIndex]: newIndex };
     });
   };
@@ -58,9 +255,6 @@ function DeletedCarsTable({
               "Year",
               "Maker",
               "Model",
-              "Color",
-              "Location",
-              "Price",
               "Submitted By",
             ].map((header) => (
               <th key={header} className="border border-gray-700 p-2">
@@ -76,51 +270,51 @@ function DeletedCarsTable({
               <tr
                 key={car.id}
                 className="cursor-pointer hover:bg-gray-700 border border-gray-700"
-                onClick={() => setSelectedCar(car)}
+                onClick={() => {
+                  setSelectedCar(car);
+                  setSelectedCarIndex(index);
+                }}
               >
                 <td className="p-2">{car.VIN}</td>
                 <td className="p-2">{car.LicensePlate}</td>
                 <td className="p-2">{car.Year}</td>
                 <td className="p-2">{car.Maker}</td>
                 <td className="p-2">{car.Model}</td>
-                <td className="p-2">{car.Color}</td>
-                <td className="p-2">{car.location}</td>
-                <td className="p-2">{car.price}</td>
                 <td className="p-2">{car.user}</td>
               </tr>
             ))}
         </tbody>
       </table>
 
-      {selectedCar && (
+      {selectedCar && selectedCarIndex !== null && (
         <div
           className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) setSelectedCar(null);
           }}
         >
-          <div className="bg-gray-800 p-4 rounded-lg shadow-lg max-w-lg w-full">
+          <div className="bg-gray-800 p-4 rounded-lg shadow-lg max-w-lg w-full relative">
             <button
               className="absolute top-4 right-4"
               onClick={() => setSelectedCar(null)}
             >
               <X size={24} color="white" />
             </button>
-            {selectedCar?.image && selectedCar.image.length > 0 && (
+            {selectedCar.image && selectedCar.image.length > 0 && (
               <div className="relative">
                 <img
-                  src={selectedCar.image[imageIndex[selectedCar.id] || 0]}
+                  src={selectedCar.image[imageIndex[selectedCarIndex] || 0]}
                   alt={selectedCar.Model}
                   className="w-full object-contain max-h-60 border-4 border-gray-700 bg-gray-900 p-2 rounded-lg"
                 />
                 <button
-                  onClick={() => handleImageChange(selectedCar.id, "prev")}
+                  onClick={() => handleImageChange(selectedCarIndex, "prev")}
                   className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full border border-gray-500 hover:bg-gray-600"
                 >
                   <ArrowLeft size={20} color="white" />
                 </button>
                 <button
-                  onClick={() => handleImageChange(selectedCar.id, "next")}
+                  onClick={() => handleImageChange(selectedCarIndex, "next")}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full border border-gray-500 hover:bg-gray-600"
                 >
                   <ArrowRight size={20} color="white" />
@@ -128,33 +322,16 @@ function DeletedCarsTable({
               </div>
             )}
             <div className="mt-4 text-blue-300">
-              <p>
-                <strong>VIN:</strong> {selectedCar.VIN}
-              </p>
-              <p>
-                <strong>License Plate:</strong> {selectedCar.LicensePlate}
-              </p>
-              <p>
-                <strong>Year:</strong> {selectedCar.Year}
-              </p>
-              <p>
-                <strong>Maker:</strong> {selectedCar.Maker}
-              </p>
-              <p>
-                <strong>Model:</strong> {selectedCar.Model}
-              </p>
-              <p>
-                <strong>Color:</strong> {selectedCar.Color}
-              </p>
-              <p>
-                <strong>Location:</strong> {selectedCar.location}
-              </p>
-              <p>
-                <strong>Price:</strong> {selectedCar.price}
-              </p>
-              <p>
-                <strong>Submitted By:</strong> {selectedCar.user}
-              </p>
+              <p><strong>VIN:</strong> {selectedCar.VIN}</p>
+              <p><strong>License Plate:</strong> {selectedCar.LicensePlate}</p>
+              <p><strong>Year:</strong> {selectedCar.Year}</p>
+              <p><strong>Maker:</strong> {selectedCar.Maker}</p>
+              <p><strong>Model:</strong> {selectedCar.Model}</p>
+              <p><strong>Color:</strong> {selectedCar.Color}</p>
+              <p><strong>Location:</strong> {selectedCar.location}</p>
+              <p><strong>Price:</strong> {selectedCar.price}</p>
+              <p><strong>Lot:</strong> {selectedCar.lot}</p>
+              <p><strong>Submitted By:</strong> {selectedCar.user}</p>
             </div>
           </div>
         </div>
@@ -162,6 +339,7 @@ function DeletedCarsTable({
     </div>
   );
 }
+
 
 export default function Lookup() {
   const [page, setPage] = useState<number>(1);
@@ -400,100 +578,32 @@ export default function Lookup() {
           </div>
         )}
 
-        {(isAdmin || userData.can_view) &&
-          !loading &&
-          activeTab === "all" &&
-          cars.map((car, carIndex) => (
-            <div
-              key={car.id}
-              className="flex flex-col p-2 w-[90vw] md:w-[50%] mx-auto bg-gray-800 border border-gray-700 rounded-lg shadow-md mt-4"
-            >
-              {car?.image && car.image.length > 0 && (
-                <div className="relative">
-                  <img
-                    src={car.image[imageIndex[carIndex] || 0]}
-                    alt={`Car ${carIndex + 1}`}
-                    className="max-h-[170px] md:max-h-[280px] w-full object-contain border-4 border-gray-700 bg-gray-900 p-4 md:p-2 rounded-lg"
-                  />
-                  <div className="absolute top-1/2 left-2 -translate-y-1/2">
-                    <button
-                      onClick={() => handleImageChange(carIndex, "prev")}
-                      className="p-2 rounded-full border border-gray-500 hover:bg-gray-600"
-                    >
-                      <ArrowLeft size={20} color="white" />
-                    </button>
-                  </div>
-                  <div className="absolute top-1/2 right-2 -translate-y-1/2">
-                    <button
-                      onClick={() => handleImageChange(carIndex, "next")}
-                      className="p-2 rounded-full border border-gray-500 hover:bg-gray-600"
-                    >
-                      <ArrowRight size={20} color="white" />
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="grid mt-4 p-2 gap-4">
-                {[
-                  { label: "VIN", value: car.VIN },
-                  { label: "License Plate", value: car.LicensePlate },
-                  { label: "Year", value: car.Year },
-                  { label: "Maker", value: car.Maker },
-                  { label: "Model", value: car.Model },
-                  { label: "Color", value: car.Color },
-                  { label: "Location", value: car.location },
-                  { label: "Price", value: car.price },
-                  { label: "Lot", value: car.lot },
-                  car?.user && { label: "Submitted By", value: car.user },
-                  isAdmin && {
-                    label: "deleted",
-                    value: car.is_deleted ? <Check /> : <XIcon />,
-                  },
-                ]
-                  .filter(Boolean)
-                  .map(({ label, value }, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-row justify-start text-sm md:text-base font-bold text-blue-300"
-                    >
-                      <span className="w-full md:w-1/5">{label}:</span>
-                      <span className="w-full md:w-1/5 text-gray-200">
-                        {value}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-
-              {(userData.can_delete || isAdmin) && (
-                <div className="p-2 mt-2">
-                  <button
-                    onClick={() => deleteCar(car.id)}
-                    className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition duration-200 shadow flex ml-auto gap-2 items-center"
-                  >
-                    <Trash size={18} strokeWidth={2} />
-                    <p>Delete</p>
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
+        {(isAdmin || userData.can_view) && !loading && activeTab === "all" && (
+          <CarsTable
+            cars={cars.filter((car) => !car.is_deleted)} // Exclude deleted cars
+            isAdmin={isAdmin}
+            userData={userData}
+            loading={loading}
+            onDeleteCar={deleteCar}
+          />
+        )}
 
         {isAdmin &&
           !loading &&
           activeTab === "deleted" &&
           deletedCars.length > 0 && (
-            <DeletedCarsTable
-              deletedCars={deletedCars}
-              isAdmin={isAdmin}
-              loading={loading}
-            />
+            <>
+              <DeletedCarsTable
+                deletedCars={deletedCars}
+                isAdmin={isAdmin}
+                loading={loading}
+              />  
+            </>
           )}
-      </div>
 
       {/* Pagination */}
       {(userData.can_view || isAdmin) && (
-        <div className="my-4 flex gap-4">
+        <div className="my-4 flex gap-4 mx-auto mt-auto">
           <ArrowLeft
             size={22}
             strokeWidth={2}
@@ -513,6 +623,7 @@ export default function Lookup() {
           />
         </div>
       )}
+      </div>
     </div>
   );
 }
