@@ -260,18 +260,13 @@ function DeletedCarsTable({
       <table className="w-[80vw] text-left border-collapse border border-gray-700">
         <thead>
           <tr className="bg-gray-800 text-blue-300">
-            {[
-              "VIN",
-              "License Plate",
-              "Year",
-              "Maker",
-              "Model",
-              "Submitted By",
-            ].map((header) => (
-              <th key={header} className="border border-gray-700 p-2">
-                {header}
-              </th>
-            ))}
+            {["VIN", "License Plate", "Year", "Maker", "Model", "Submitted By"].map(
+              (header) => (
+                <th key={header} className="border-r border-gray-700 p-2">
+                  {header}
+                </th>
+              )
+            )}
           </tr>
         </thead>
         <tbody>
@@ -286,16 +281,29 @@ function DeletedCarsTable({
                   setSelectedCarIndex(index);
                 }}
               >
-                <td className="p-2">{car.VIN}</td>
-                <td className="p-2">{car.LicensePlate}</td>
-                <td className="p-2">{car.Year}</td>
-                <td className="p-2">{car.Maker}</td>
-                <td className="p-2">{car.Model}</td>
-                <td className="p-2">{car.user}</td>
+                <td className="p-2 border-r border-gray-700 max-w-[150px] overflow-hidden text-ellipsis">
+                  {car.VIN}
+                </td>
+                <td className="p-2 border-r border-gray-700 max-w-[150px] overflow-hidden text-ellipsis">
+                  {car.LicensePlate}
+                </td>
+                <td className="p-2 border-r border-gray-700 max-w-[100px] overflow-hidden text-ellipsis">
+                  {car.Year}
+                </td>
+                <td className="p-2 border-r border-gray-700 max-w-[150px] overflow-hidden text-ellipsis">
+                  {car.Maker}
+                </td>
+                <td className="p-2 border-r border-gray-700 max-w-[150px] overflow-hidden text-ellipsis">
+                  {car.Model}
+                </td>
+                <td className="p-2 max-w-[150px] overflow-hidden text-ellipsis">
+                  {car.user}
+                </td>
               </tr>
             ))}
         </tbody>
       </table>
+
 
       {selectedCar && selectedCarIndex !== null && (
         <div
@@ -440,17 +448,17 @@ export default function Lookup() {
     }
   };
 
-  const handleImageChange = (carIndex: number, direction: "prev" | "next") => {
-    setImageIndex((prevState) => {
-      const currentIndex = prevState[carIndex] || 0;
-      const imagesCount = cars[carIndex]?.image.length || 1;
-      const newIndex =
-        direction === "next"
-          ? (currentIndex + 1) % imagesCount
-          : (currentIndex - 1 + imagesCount) % imagesCount;
-      return { ...prevState, [carIndex]: newIndex };
-    });
-  };
+  // const handleImageChange = (carIndex: number, direction: "prev" | "next") => {
+  //   setImageIndex((prevState) => {
+  //     const currentIndex = prevState[carIndex] || 0;
+  //     const imagesCount = cars[carIndex]?.image.length || 1;
+  //     const newIndex =
+  //       direction === "next"
+  //         ? (currentIndex + 1) % imagesCount
+  //         : (currentIndex - 1 + imagesCount) % imagesCount;
+  //     return { ...prevState, [carIndex]: newIndex };
+  //   });
+  // };
 
   useEffect(() => {
     console.log("deleted cars", deletedCars);
@@ -541,7 +549,7 @@ export default function Lookup() {
             type="text"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Search for entry with VIN or License Plate"
+            placeholder="Search by VIN, License Plate, Year, Make, Model, Color, User, or Location..."
             className="w-[90vw] md:w-[40vw] lg:w-[30vw] pl-10 pr-3 py-2 border outline-none border-gray-500 bg-gray-700 rounded-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
           />
         </div>
@@ -554,7 +562,7 @@ export default function Lookup() {
             type="text"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Search for deleted entry with VIN or License Plate"
+            placeholder="Search for deleted entry with VIN, License Plate, or other details..."
             className="w-[90vw] md:w-[40vw] lg:w-[30vw] pl-10 pr-3 py-2 border outline-none border-gray-500 bg-gray-700 rounded-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-white"
           />
         </div>
